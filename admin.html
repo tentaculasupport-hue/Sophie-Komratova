@@ -48,11 +48,19 @@
     <!-- Dashboard View -->
     <div id="dashboard-view" class="hidden w-full max-w-6xl space-y-6">
         <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
-            <div>
+            <div class="flex items-center gap-6">
+                <img src="logo/logo.png" alt="Logo" class="w-20 h-auto">
                 <h1 class="text-4xl font-serif text-sage">Заявки с сайта</h1>
-                <p class="text-gray-500">Управление лидами из таблицы leads_web</p>
             </div>
-            <button id="logout-btn" class="text-sm font-medium text-gray-400 hover:text-red-500 transition uppercase tracking-widest">Выйти</button>
+            <div class="flex items-center gap-4">
+                <select id="status-filter" class="px-4 py-2 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-sage outline-none bg-white">
+                    <option value="all">Все статусы</option>
+                    <option value="Новый">Новые</option>
+                    <option value="В работе">В работе</option>
+                    <option value="Завершено">Завершенные</option>
+                </select>
+                <button id="logout-btn" class="text-sm font-medium text-gray-400 hover:text-red-500 transition uppercase tracking-widest">Выйти</button>
+            </div>
         </div>
 
         <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
@@ -80,6 +88,7 @@
         const loginForm = document.getElementById('login-form');
         const errorMsg = document.getElementById('error-msg');
         const leadsTable = document.getElementById('leads-table');
+        const statusFilter = document.getElementById('status-filter');
 
         let client;
 
