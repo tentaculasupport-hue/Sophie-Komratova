@@ -6,6 +6,7 @@
     <title>Панель управления | Вход</title>
     <link rel="icon" type="image/png" href="logo/logo-telegram.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -63,6 +64,13 @@
             </div>
         </div>
 
+        <!-- Income Graph Section -->
+        <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
+            <h3 class="text-lg font-serif mb-4 text-sage">Аналитика дохода (Завершенные записи)</h3>
+            <canvas id="incomeChart" height="100"></canvas>
+        </div>
+
+        <!-- Table Section -->
         <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -80,6 +88,17 @@
                 </table>
             </div>
         </div>
+
+        <!-- Bottom Section: Calendar -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 md:col-span-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-serif text-sage">Календарь заявок</h3>
+                    <span id="calendar-month" class="text-xs font-bold uppercase tracking-widest text-gray-400"></span>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -89,8 +108,11 @@
         const errorMsg = document.getElementById('error-msg');
         const leadsTable = document.getElementById('leads-table');
         const statusFilter = document.getElementById('status-filter');
+        const calendarGrid = document.getElementById('calendar-grid');
+        const calendarMonth = document.getElementById('calendar-month');
 
         let client;
+        let incomeChart = null;
 
         // Проверка сессии при загрузке
         async function init() {
@@ -134,6 +156,9 @@
 
             if (error) return console.error('Error fetching leads:', error);
 
+            renderGraph(data);
+            renderCalendar(data);
+
             leadsTable.innerHTML = data.map(lead => `
                 <tr class="hover:bg-sand/30 transition-colors">
                     <td class="px-8 py-6 text-xs text-gray-400 font-light">
@@ -150,6 +175,91 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function renderGraph(data) {
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            
+            // Группируем доход (условно 5000 за статус "Завершено") по датам
+            const last7Days = [...Array(7)].map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                return d.toISOString().split('T')[0];
+            }).reverse();
+
+            const incomeStats = last7Days.map(date => {
+                return data
+                    .filter(l => l.status === 'Завершено' && l.created_at.startsWith(date))
+                    .length * 5000; // Примерная стоимость сессии
+            });
+
+            if (incomeChart) incomeChart.destroy();
+            
+            incomeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(d => new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })),
+                    datasets: [{
+                        label: 'Условный доход (₽)',
+                        data: incomeStats,
+                        borderColor: '#4A5D4E',
+                        backgroundColor: 'rgba(74, 93, 78, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderCalendar(data) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            calendarMonth.innerText = now.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let html = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(d => `<div class="font-bold text-gray-300 mb-2">${d}</div>`).join('');
+            
+            // Смещение для начала недели (пн)
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+            
+            for (let i = 0; i < offset; i++) html += '<div></div>';
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const leadsThisDay = data.filter(l => l.created_at.startsWith(dateStr));
+                
+                const hasLeads = leadsThisDay.length > 0;
+                const isToday = day === now.getDate();
+                
+                html += `
+                    <div class="relative group py-2 rounded-lg transition cursor-pointer 
+                        ${hasLeads ? 'bg-sage/10 text-sage font-bold' : 'text-gray-400 hover:bg-gray-100'} 
+                        ${isToday ? 'border border-sage' : ''}"
+                        onclick="${hasLeads ? `alert('Заявки на ${day} число: \\n${leadsThisDay.map(l => '- ' + l.name).join('\\n')}')` : ''}">
+                        ${day}
+                        ${hasLeads ? `<span class="absolute top-1 right-1 w-1 h-1 bg-sage rounded-full"></span>` : ''}
+                        
+                        <!-- Tooltip on hover -->
+                        ${hasLeads ? `
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 bg-graphite text-white text-[10px] p-2 rounded shadow-xl whitespace-nowrap">
+                            Лидов: ${leadsThisDay.length}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            calendarGrid.innerHTML = html;
         }
 
         window.updateLeadStatus = async (id, newStatus) => {
