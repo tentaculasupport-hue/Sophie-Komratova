@@ -1,14 +1,15 @@
 import { getAdminClient } from '../supabase-client.js';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(200).send('OK');
-
-  const body = req.body;
-  if (!body || typeof body !== 'object') {
-    return res.status(400).send('Invalid JSON');
+  // Жесткий фильтр метода: если это браузер (GET), отдаем 200 и не падаем
+  if (req.method !== 'POST') {
+    return res.status(200).json({ status: "alive", message: "Send POST request" });
   }
 
+  // Безопасный парсинг тела запроса
+  const body = req.body || {};
   const { message } = body;
+  
   if (!message || !message.text) return res.status(200).send('OK');
 
   const supabase = getAdminClient();
@@ -149,7 +150,6 @@ async function processLead(supabase, chatId, userText, cleanTgUsername) {
   }
 }
 
-// 6. УПРОЩЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ЛИДА
 async function upsertLead(supabase, chatId, cleanTgUsername, text) {
   const contactInfo = cleanTgUsername ? `@${cleanTgUsername}` : `ID: ${chatId}`;
 
