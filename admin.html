@@ -64,20 +64,27 @@
     </div>
 
     <script>
-        // Конфигурация Supabase (Замените на ваши ключи из настроек проекта)
-        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
-        
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         const loginView = document.getElementById('login-view');
         const dashboardView = document.getElementById('dashboard-view');
         const loginForm = document.getElementById('login-form');
         const errorMsg = document.getElementById('error-msg');
         const leadsTable = document.getElementById('leads-table');
 
+        let client;
+
         // Проверка сессии при загрузке
         async function init() {
+            try {
+                // Подтягиваем конфиг из секретов через API
+                const configRes = await fetch('/api/config');
+                const config = await configRes.json();
+                
+                client = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            } catch (err) {
+                console.error("Ошибка загрузки конфигурации:", err);
+                return;
+            }
+
             const { data: { session } } = await client.auth.getSession();
             if (session) renderDashboard();
         }
