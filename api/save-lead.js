@@ -6,11 +6,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, phone } = req.body;
+  const { name, phone, city } = req.body;
 
   // Простая валидация
-  if (!name || !phone) {
-    return res.status(400).json({ error: 'Имя и телефон обязательны для заполнения' });
+  if (!name || !phone || !city) {
+    return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
   }
 
   try {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     
     const { error } = await supabase
       .from('leads_web')
-      .insert([{ name, phone, source: 'landing_page', status: 'Новый' }]);
+      .insert([{ name, phone, city, source: 'landing_page', status: 'Новый', payment_status: 'Не оплачено' }]);
 
     if (error) throw error;
 

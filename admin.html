@@ -92,8 +92,10 @@
                             <tr>
                                 <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Дата</th>
                                 <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Клиент</th>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Город</th>
                                 <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Телефон</th>
                                 <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Статус</th>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Оплата</th>
                             </tr>
                         </thead>
                         <tbody id="leads-table" class="divide-y divide-gray-50">
@@ -169,12 +171,19 @@
                         ${new Date(lead.created_at).toLocaleDateString('ru-RU')}
                     </td>
                     <td class="px-8 py-6 font-medium text-graphite">${lead.name}</td>
+                    <td class="px-8 py-6 text-sm text-gray-500">${lead.city || '—'}</td>
                     <td class="px-8 py-6 text-gray-600">${lead.phone}</td>
                     <td class="px-8 py-6">
                         <select onchange="updateLeadStatus('${lead.id}', this.value)" class="bg-sage/10 text-sage text-[10px] uppercase font-bold rounded-full px-3 py-1 border-none focus:ring-2 focus:ring-sage cursor-pointer outline-none appearance-none">
                             <option value="Новый" ${lead.status === 'Новый' || lead.status === 'new' || !lead.status ? 'selected' : ''}>Новый</option>
                             <option value="В работе" ${lead.status === 'В работе' ? 'selected' : ''}>В работе</option>
                             <option value="Завершено" ${lead.status === 'Завершено' ? 'selected' : ''}>Завершено</option>
+                        </select>
+                    </td>
+                    <td class="px-8 py-6">
+                        <select onchange="updatePaymentStatus('${lead.id}', this.value)" class="text-[10px] uppercase font-bold rounded-full px-3 py-1 border transition-colors cursor-pointer outline-none ${lead.payment_status === 'Оплачено' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'}">
+                            <option value="Не оплачено" ${lead.payment_status === 'Не оплачено' ? 'selected' : ''}>Не оплачено</option>
+                            <option value="Оплачено" ${lead.payment_status === 'Оплачено' ? 'selected' : ''}>Оплачено</option>
                         </select>
                     </td>
                 </tr>
@@ -276,6 +285,16 @@
                 alert('Ошибка обновления статуса: ' + error.message);
             }
             // Всегда обновляем, чтобы UI соответствовал фильтру
+            renderDashboard(statusFilter.value);
+        };
+
+        window.updatePaymentStatus = async (id, newPaymentStatus) => {
+            const { error } = await client
+                .from('leads_web')
+                .update({ payment_status: newPaymentStatus })
+                .eq('id', id);
+            
+            if (error) alert('Ошибка обновления оплаты: ' + error.message);
             renderDashboard(statusFilter.value);
         };
 
