@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления | Вход</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sage: #4A5D4E; --sand: #F5F5F0; --graphite: #2D2D2D; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--sand); color: var(--graphite); }
+        .font-serif { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Login View -->
+    <div id="login-view" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-500">
+        <h1 class="text-3xl font-serif mb-6 text-center text-sage">Админ-панель</h1>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1 text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required placeholder="admin@example.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-sage outline-none transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1 text-gray-700">Пароль</label>
+                <input type="password" id="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-sage outline-none transition">
+            </div>
+            <button type="submit" id="login-btn" class="w-full bg-sage text-white py-4 rounded-xl font-medium hover:opacity-90 transition transform active:scale-95">
+                Войти в систему
+            </button>
+            <p id="error-msg" class="text-red-500 text-sm hidden text-center mt-4"></p>
+        </form>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="hidden w-full max-w-6xl space-y-6">
+        <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+            <div>
+                <h1 class="text-4xl font-serif text-sage">Заявки с сайта</h1>
+                <p class="text-gray-500">Управление лидами из таблицы leads_web</p>
+            </div>
+            <button id="logout-btn" class="text-sm font-medium text-gray-400 hover:text-red-500 transition uppercase tracking-widest">Выйти</button>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50/50 border-b">
+                        <tr>
+                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Дата</th>
+                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Клиент</th>
+                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Телефон</th>
+                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-table" class="divide-y divide-gray-50">
+                        <!-- Leads will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация Supabase (Замените на ваши ключи из настроек проекта)
+        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+        
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const loginView = document.getElementById('login-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        const loginForm = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
+        const leadsTable = document.getElementById('leads-table');
+
+        // Проверка сессии при загрузке
+        async function init() {
+            const { data: { session } } = await client.auth.getSession();
+            if (session) renderDashboard();
+        }
+
+        async function renderDashboard() {
+            loginView.classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            
+            const { data, error } = await client
+                .from('leads_web')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) return console.error('Error fetching leads:', error);
+
+            leadsTable.innerHTML = data.map(lead => `
+                <tr class="hover:bg-sand/30 transition-colors">
+                    <td class="px-8 py-6 text-sm text-gray-400 font-light">
+                        ${new Date(lead.created_at).toLocaleDateString('ru-RU')}
+                    </td>
+                    <td class="px-8 py-6 font-medium text-graphite">${lead.name}</td>
+                    <td class="px-8 py-6 text-gray-600">${lead.phone}</td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 rounded-full text-[10px] uppercase tracking-tighter font-bold bg-sage/10 text-sage">
+                            ${lead.status || 'Новый'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerText = 'Проверка...';
+            
+            const { error } = await client.auth.signInWithPassword({
+                email: loginForm.email.value,
+                password: loginForm.password.value
+            });
+
+            if (error) {
+                errorMsg.innerText = 'Доступ запрещен: ' + error.message;
+                errorMsg.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = 'Войти в систему';
+            } else {
+                renderDashboard();
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = async () => {
+            await client.auth.signOut();
+            location.reload();
+        };
+
+        init();
+    </script>
+</body>
+</html>
