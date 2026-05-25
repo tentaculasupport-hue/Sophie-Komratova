@@ -47,7 +47,7 @@
     </div>
 
     <!-- Dashboard View -->
-    <div id="dashboard-view" class="hidden w-full max-w-6xl space-y-6">
+    <div id="dashboard-view" class="hidden w-full max-w-7xl space-y-6">
         <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
             <div class="flex items-center gap-6">
                 <img src="logo/logo.png" alt="Logo" class="w-20 h-auto">
@@ -64,39 +64,43 @@
             </div>
         </div>
 
-        <!-- Income Graph Section -->
-        <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
-            <h3 class="text-lg font-serif mb-4 text-sage">Аналитика дохода (Завершенные записи)</h3>
-            <canvas id="incomeChart" height="100"></canvas>
-        </div>
-
-        <!-- Table Section -->
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-50/50 border-b">
-                        <tr>
-                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Дата</th>
-                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Клиент</th>
-                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Телефон</th>
-                            <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leads-table" class="divide-y divide-gray-50">
-                        <!-- Leads will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Bottom Section: Calendar -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 md:col-span-1">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-serif text-sage">Календарь заявок</h3>
-                    <span id="calendar-month" class="text-xs font-bold uppercase tracking-widest text-gray-400"></span>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Analytics Column -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-10">
+                <div>
+                    <h3 class="text-lg font-serif mb-4 text-sage border-b border-gray-50 pb-2">Аналитика дохода</h3>
+                    <canvas id="incomeChart" height="200"></canvas>
                 </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-50 pb-2">
+                        <h3 class="text-lg font-serif text-sage font-medium">Календарь заявок</h3>
+                        <span id="calendar-month" class="text-[10px] font-bold uppercase tracking-widest text-gray-400"></span>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-[10px]"></div>
+                </div>
+            </div>
+
+            <!-- Leads Management Column -->
+            <div class="lg:col-span-8 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                <div class="p-6 border-b border-gray-50">
+                    <h3 class="text-lg font-serif text-sage">Список активных заявок</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50/50 border-b">
+                            <tr>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Дата</th>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Клиент</th>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Телефон</th>
+                                <th class="px-8 py-5 text-xs uppercase tracking-widest font-semibold text-gray-400">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table" class="divide-y divide-gray-50">
+                            <!-- Leads will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
