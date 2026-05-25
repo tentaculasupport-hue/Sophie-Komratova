@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     
     const { error } = await supabase
       .from('leads_web')
-      .insert([{ name, phone, source: 'landing_page' }]);
+      .insert([{ name, phone, source: 'landing_page', status: 'Новый' }]);
 
     if (error) throw error;
 
