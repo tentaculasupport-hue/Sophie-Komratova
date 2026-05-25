@@ -52,7 +52,8 @@ async function processLead(supabase, chatId, userText, cleanTgUsername) {
     return;
   }
 
-  const systemInstruction = botPrompt.system_instruction;
+  // Инструктируем ИИ завершать диалог ссылкой на раздел "Обо мне"
+  const systemInstruction = `${botPrompt.system_instruction}\n\nВАЖНО: Когда диалог будет подходить к завершению (после ответов на все вопросы или при прощании), обязательно предложи пользователю узнать больше о тебе, перейдя по ссылке: https://sophie-komratova.vercel.app/#about`;
 
   // 2. ЧТЕНИЕ ИСТОРИИ ДИАЛОГА
   const { data: dbData } = await supabase
