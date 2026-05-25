@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бережная психотерапия | Личный кабинет</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body class="bg-sand text-graphite font-sans leading-relaxed overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 px-6 py-4 flex justify-between items-center bg-sand/80 backdrop-blur-md">
+        <div class="text-xl font-serif tracking-tight">Алина С.</div>
+        <div class="hidden md:flex space-x-8 text-sm uppercase tracking-widest">
+            <a href="#about" class="hover:text-sage transition">Обо мне</a>
+            <a href="#method" class="hover:text-sage transition">Метод</a>
+            <a href="#contact" class="hover:text-sage transition">Контакты</a>
+        </div>
+        <a href="https://t.me/your_bot" class="bg-sage text-white px-6 py-2 rounded-full text-sm hover:opacity-90 transition">Чат с ИИ</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center pt-20 px-6 lg:px-24">
+        <div class="container mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right" data-aos-duration="1000">
+                <h1 class="text-5xl lg:text-7xl font-serif mb-6 leading-tight">
+                    Верни себе чувство <span class="italic text-sage">опоры</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-md">
+                    Бережная психотерапия для тех, кто устал справляться в одиночку. Создаю безопасное пространство, где можно быть собой.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="bg-sage text-white px-8 py-4 rounded-full font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        Записаться на знакомство
+                    </button>
+                    <button class="border border-sage text-sage px-8 py-4 rounded-full font-medium hover:bg-sage/5 transition">
+                        Консультация с ИИ
+                    </button>
+                </div>
+            </div>
+            <div class="relative" data-aos="fade-left" data-aos-duration="1200">
+                <div class="aspect-[4/5] bg-gray-200 rounded-2xl overflow-hidden shadow-2xl">
+                    <!-- Замените на реальное фото -->
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1000" alt="Psychologist Portrait" class="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition duration-700">
+                </div>
+                <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl hidden lg:block" data-aos="zoom-in" data-aos-delay="500">
+                    <p class="text-sage font-serif italic text-xl">"Ты не одна."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pains Section -->
+    <section id="pains" class="py-24 bg-white px-6">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h2 class="text-3xl md:text-4xl font-serif mb-16" data-aos="fade-up">Когда внутри слишком громко, а сил на внешнее не остается</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-2xl bg-sand/30 hover:bg-sand/50 transition" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-sage mb-4 text-2xl">01</div>
+                    <h3 class="font-serif text-xl mb-3">Тревога</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Постоянное беспокойство о будущем и страх совершить ошибку.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-sand/30 hover:bg-sand/50 transition" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-sage mb-4 text-2xl">02</div>
+                    <h3 class="font-serif text-xl mb-3">Выгорание</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Чувство опустошенности, когда даже любимые вещи не приносят радости.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-sand/30 hover:bg-sand/50 transition" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-sage mb-4 text-2xl">03</div>
+                    <h3 class="font-serif text-xl mb-3">Одиночество</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Ощущение, что вас никто не понимает, даже когда вокруг много людей.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA AI Sticky -->
+    <div class="fixed bottom-6 right-6 z-[100]" data-aos="fade-left">
+        <a href="https://t.me/your_bot" class="flex items-center space-x-3 bg-graphite text-white p-2 pr-6 rounded-full shadow-2xl hover:scale-105 transition-transform">
+            <div class="w-10 h-10 bg-sage rounded-full flex items-center justify-center font-bold">ИИ</div>
+            <span class="text-sm font-medium">Нужна помощь прямо сейчас?</span>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-sand border-t border-gray-200 px-6">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+            <div class="font-serif text-lg">Алина С.</div>
+            <div class="text-sm text-gray-500">© 2024 Все права защищены. Бережная психотерапия.</div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-graphite hover:text-sage transition">Instagram</a>
+                <a href="#" class="text-graphite hover:text-sage transition">Telegram</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            once: true,
+            offset: 100
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+:root {
+    --sage: #4A5D4E;
+    --sand: #F5F5F0;
+    --graphite: #2D2D2D;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+.bg-sand {
+    background-color: var(--sand);
+}
+
+.bg-sage {
+    background-color: var(--sage);
+}
+
+.text-sage {
+    color: var(--sage);
+}
+
+.text-graphite {
+    color: var(--graphite);
+}
+
+.border-sage {
+    border-color: var(--sage);
+}
+
+/* Плавный переход для всех интерактивных элементов */
+a, button {
+    transition: all 0.3s ease;
+}
