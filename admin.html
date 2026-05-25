@@ -60,6 +60,11 @@
                     <option value="В работе">В работе</option>
                     <option value="Завершено">Завершенные</option>
                 </select>
+                <select id="payment-filter" class="px-4 py-2 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-sage outline-none bg-white">
+                    <option value="all">Все оплаты</option>
+                    <option value="Оплачено">Оплачено</option>
+                    <option value="Не оплачено">Не оплачено</option>
+                </select>
                 <button id="logout-btn" class="text-sm font-medium text-gray-400 hover:text-red-500 transition uppercase tracking-widest">Выйти</button>
             </div>
         </div>
@@ -114,6 +119,7 @@
         const errorMsg = document.getElementById('error-msg');
         const leadsTable = document.getElementById('leads-table');
         const statusFilter = document.getElementById('status-filter');
+        const paymentFilter = document.getElementById('payment-filter');
         const calendarGrid = document.getElementById('calendar-grid');
         const calendarMonth = document.getElementById('calendar-month');
 
@@ -130,9 +136,8 @@
                 client = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
 
                 // Навешиваем событие сразу, чтобы оно работало и после логина
-                statusFilter.addEventListener('change', () => {
-                    renderDashboard(statusFilter.value);
-                });
+                statusFilter.addEventListener('change', () => renderDashboard());
+                paymentFilter.addEventListener('change', () => renderDashboard());
             } catch (err) {
                 console.error("Ошибка загрузки конфигурации:", err);
                 return;
@@ -142,20 +147,27 @@
             if (session) renderDashboard();
         }
 
-        async function renderDashboard(filterValue = 'all') {
+        async function renderDashboard() {
             loginView.classList.add('hidden');
             dashboardView.classList.remove('hidden');
             
+            const statusVal = statusFilter.value;
+            const paymentVal = paymentFilter.value;
+
             let query = client
                 .from('leads_web')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             // Если фильтр на "Новые", учитываем и старый технический статус 'new'
-            if (filterValue === 'Новый') {
+            if (statusVal === 'Новый') {
                 query = query.or('status.eq.Новый,status.eq.new');
-            } else if (filterValue !== 'all') {
-                query = query.eq('status', filterValue);
+            } else if (statusVal !== 'all') {
+                query = query.eq('status', statusVal);
+            }
+
+            if (paymentVal !== 'all') {
+                query = query.eq('payment_status', paymentVal);
             }
 
             const { data, error } = await query;
@@ -193,7 +205,7 @@
         function renderGraph(data) {
             const ctx = document.getElementById('incomeChart').getContext('2d');
             
-            // Группируем доход (условно 5000 за статус "Завершено") по датам
+            // Группируем доход (2000 за статус "Оплачено") по датам
             const last7Days = [...Array(7)].map((_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
@@ -201,9 +213,10 @@
             }).reverse();
 
             const incomeStats = last7Days.map(date => {
+                // Суммируем по 2000 за каждый оплаченный лид в этот день
                 return data
-                    .filter(l => l.status === 'Завершено' && l.created_at.startsWith(date))
-                    .length * 5000; // Примерная стоимость сессии
+                    .filter(l => l.payment_status === 'Оплачено' && l.created_at.startsWith(date))
+                    .length * 2000;
             });
 
             if (incomeChart) incomeChart.destroy();
@@ -285,7 +298,7 @@
                 alert('Ошибка обновления статуса: ' + error.message);
             }
             // Всегда обновляем, чтобы UI соответствовал фильтру
-            renderDashboard(statusFilter.value);
+            renderDashboard();
         };
 
         window.updatePaymentStatus = async (id, newPaymentStatus) => {
@@ -295,7 +308,7 @@
                 .eq('id', id);
             
             if (error) alert('Ошибка обновления оплаты: ' + error.message);
-            renderDashboard(statusFilter.value);
+            renderDashboard();
         };
 
         loginForm.onsubmit = async (e) => {
