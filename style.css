@@ -42,3 +42,19 @@ body {
 a, button {
     transition: all 0.3s ease;
 }
+
+/* Custom Pulse Animation for Logo */
+@keyframes pulse-custom {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+.animate-pulse-custom {
+    animation: pulse-custom 2s infinite ease-in-out;
+}
