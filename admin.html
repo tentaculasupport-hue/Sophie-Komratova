@@ -106,35 +106,61 @@
             }
 
             const { data: { session } } = await client.auth.getSession();
-            if (session) renderDashboard();
+            if (session) {
+                renderDashboard();
+                // Добавляем слушатель для фильтра
+                statusFilter.addEventListener('change', () => renderDashboard(statusFilter.value));
+            }
         }
 
-        async function renderDashboard() {
+        async function renderDashboard(filterValue = 'all') {
             loginView.classList.add('hidden');
             dashboardView.classList.remove('hidden');
             
-            const { data, error } = await client
+            let query = client
                 .from('leads_web')
                 .select('*')
                 .order('created_at', { ascending: false });
+
+            if (filterValue !== 'all') {
+                query = query.eq('status', filterValue);
+            }
+
+            const { data, error } = await query;
 
             if (error) return console.error('Error fetching leads:', error);
 
             leadsTable.innerHTML = data.map(lead => `
                 <tr class="hover:bg-sand/30 transition-colors">
-                    <td class="px-8 py-6 text-sm text-gray-400 font-light">
+                    <td class="px-8 py-6 text-xs text-gray-400 font-light">
                         ${new Date(lead.created_at).toLocaleDateString('ru-RU')}
                     </td>
                     <td class="px-8 py-6 font-medium text-graphite">${lead.name}</td>
                     <td class="px-8 py-6 text-gray-600">${lead.phone}</td>
                     <td class="px-8 py-6">
-                        <span class="px-3 py-1 rounded-full text-[10px] uppercase tracking-tighter font-bold bg-sage/10 text-sage">
-                            ${lead.status || 'Новый'}
-                        </span>
+                        <select onchange="updateLeadStatus('${lead.id}', this.value)" class="bg-sage/10 text-sage text-[10px] uppercase font-bold rounded-full px-3 py-1 border-none focus:ring-2 focus:ring-sage cursor-pointer outline-none appearance-none">
+                            <option value="Новый" ${lead.status === 'Новый' || !lead.status ? 'selected' : ''}>Новый</option>
+                            <option value="В работе" ${lead.status === 'В работе' ? 'selected' : ''}>В работе</option>
+                            <option value="Завершено" ${lead.status === 'Завершено' ? 'selected' : ''}>Завершено</option>
+                        </select>
                     </td>
                 </tr>
             `).join('');
         }
+
+        window.updateLeadStatus = async (id, newStatus) => {
+            const { error } = await client
+                .from('leads_web')
+                .update({ status: newStatus })
+                .eq('id', id);
+            
+            if (error) {
+                alert('Ошибка обновления статуса: ' + error.message);
+            } else if (statusFilter.value !== 'all') {
+                // Если применен фильтр, обновляем таблицу, чтобы убрать лид с другим статусом
+                renderDashboard(statusFilter.value);
+            }
+        };
 
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
