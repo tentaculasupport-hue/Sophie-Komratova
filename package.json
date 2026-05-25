@@ -1,0 +1,7 @@
+{
+  "name": "SophieKomratova_bot",
+  "version": "1.0.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1"
+  }
+}
