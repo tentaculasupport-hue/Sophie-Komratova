@@ -158,10 +158,40 @@
             e.target.value = formatted;
         });
 
-        document.getElementById('contactForm').onsubmit = (e) => {
+        document.getElementById('contactForm').onsubmit = async (e) => {
             e.preventDefault();
-            alert('Спасибо! Мы свяжемся с вами в ближайшее время.');
-            closeModal();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+
+            // Индикация загрузки
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Отправка...';
+
+            const formData = new FormData(form);
+            const data = {
+                name: formData.get('name'),
+                phone: formData.get('phone')
+            };
+
+            try {
+                const response = await fetch('/api/save-lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Network error');
+
+                alert('Спасибо! Мы свяжемся с вами в ближайшее время.');
+                closeModal();
+                form.reset();
+            } catch (err) {
+                alert('Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         };
     </script>
 </body>
