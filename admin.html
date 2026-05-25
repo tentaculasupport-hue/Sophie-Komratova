@@ -74,9 +74,15 @@
             <div class="lg:col-span-4 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-10">
                 <div>
                     <h3 class="text-lg font-serif mb-4 text-sage border-b border-gray-50 pb-2">Аналитика дохода</h3>
-                    <div class="mb-6">
-                        <span id="total-income" class="text-3xl font-bold text-graphite">0 ₽</span>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Доход за последние 7 дней</p>
+                    <div class="mb-6 flex items-baseline justify-between">
+                        <div>
+                            <span id="total-income" class="text-3xl font-bold text-graphite">0 ₽</span>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Доход за последние 7 дней</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="conversion-rate" class="text-2xl font-bold text-sage">0%</span>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Конверсия</p>
+                        </div>
                     </div>
                     <canvas id="incomeChart" height="200"></canvas>
                 </div>
@@ -225,6 +231,12 @@
 
             const totalIncome = incomeStats.reduce((sum, val) => sum + val, 0);
             document.getElementById('total-income').innerText = `${totalIncome.toLocaleString('ru-RU')} ₽`;
+
+            // Расчет конверсии за те же 7 дней
+            const leads7Days = data.filter(l => last7Days.some(d => l.created_at.startsWith(d)));
+            const paid7Days = leads7Days.filter(l => l.payment_status === 'Оплачено').length;
+            const conversion = leads7Days.length > 0 ? Math.round((paid7Days / leads7Days.length) * 100) : 0;
+            document.getElementById('conversion-rate').innerText = `${conversion}%`;
 
             if (incomeChart) incomeChart.destroy();
             
