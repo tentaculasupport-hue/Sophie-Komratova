@@ -68,19 +68,20 @@ async function processLead(supabase, chatId, userText, ownerId, cleanTgUsername)
   }
 
   // 0.5. ДИНАМІЧНЕ ЗАВАНТАЖЕННЯ НАЛАШТУВАНЬ ТА ПРОМПТУ (Одним запитом)
-  const { data: promptData, error: promptError } = await supabase
+  // 🟢 СТАЛО: Поиск промта для Алины в новой структуре таблицы prompts
+  const { data: botPrompt, error: promptError } = await supabase
     .from('prompts')
-    .select('content, temperature, greeting_text, payment_link')
-    .eq('name', 'main_bot')
+    .select('*')
+    .eq('agent_name', 'alina')
     .single();
 
-  if (promptError) {
-    console.error("[PROMPT ERROR] Помилка завантаження конфігурації бота:", promptError);
-    throw new Error("Не вдалося завантажити базові налаштування бота.");
+  if (promptError || !botPrompt) {
+    console.error("Промт для 'alina' не найден в базе данных. Проверь таблицу prompts.");
+    throw new Error("Не вдалося завантажити базові налаштування бота для Алины.");
   }
 
-  const greetingText = promptData.greeting_text || "Добрий день! Мене звати Олег. Чим я можу допомогти?";
-  const paymentLink = promptData.payment_link || "https://tentacula-project.vercel.app/index.html";
+  const greetingText = botPrompt.greeting_text || "Добрий день! Мене звати Олег. Чим я можу допомогти?";
+  const paymentLink = botPrompt.payment_link || "https://tentacula-project.vercel.app/index.html";
 
   // 1. Перевіряємо команду /start з pythagoras_hash (UUID)
   const startCommandMatch = userText.match(/^\/start\s+([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/i);
@@ -214,7 +215,7 @@ async function processLead(supabase, chatId, userText, ownerId, cleanTgUsername)
   currentHistory.push({ role: "user", content: userText });
 
   // СИСТЕМА ТОЧЕЧНОГО ТРИГГЕРНОГО ПЕРЕХВАТА СЦЕНАРИЕВ
-  let systemInstruction = promptData.content;
+  let systemInstruction = botPrompt.content;
   let injectionMessage = null; // Флаг для отдельного системного сообщения
   
   try {
@@ -294,7 +295,7 @@ async function processLead(supabase, chatId, userText, ownerId, cleanTgUsername)
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: messagesForGroq,
-        temperature: promptData.temperature ?? 0.7,
+        temperature: botPrompt.temperature ?? 0.7,
         top_p: 0.9,
         max_tokens: 350
       })
