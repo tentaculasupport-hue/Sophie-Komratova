@@ -12,11 +12,21 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--sand); color: var(--graphite); }
         .font-serif { font-family: 'Playfair Display', serif; }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { sage: '#4A5D4E', sand: '#F5F5F0', graphite: '#2D2D2D' }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <!-- Login View -->
     <div id="login-view" class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-500">
+        <img src="logo/logo.png" alt="Logo" class="w-32 h-auto mx-auto mb-6">
         <h1 class="text-3xl font-serif mb-6 text-center text-sage">Админ-панель</h1>
         <form id="login-form" class="space-y-4">
             <div>
@@ -27,7 +37,7 @@
                 <label class="block text-sm font-medium mb-1 text-gray-700">Пароль</label>
                 <input type="password" id="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-sage outline-none transition">
             </div>
-            <button type="submit" id="login-btn" class="w-full bg-sage text-white py-4 rounded-xl font-medium hover:opacity-90 transition transform active:scale-95">
+            <button type="submit" id="login-btn" class="w-full bg-graphite text-white py-4 rounded-xl font-medium hover:opacity-90 transition transform active:scale-95">
                 Войти в систему
             </button>
             <p id="error-msg" class="text-red-500 text-sm hidden text-center mt-4"></p>
