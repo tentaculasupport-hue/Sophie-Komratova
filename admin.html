@@ -74,6 +74,10 @@
             <div class="lg:col-span-4 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-10">
                 <div>
                     <h3 class="text-lg font-serif mb-4 text-sage border-b border-gray-50 pb-2">Аналитика дохода</h3>
+                    <div class="mb-6">
+                        <span id="total-income" class="text-3xl font-bold text-graphite">0 ₽</span>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Доход за последние 7 дней</p>
+                    </div>
                     <canvas id="incomeChart" height="200"></canvas>
                 </div>
                 
@@ -218,6 +222,9 @@
                     .filter(l => l.payment_status === 'Оплачено' && l.created_at.startsWith(date))
                     .length * 2000;
             });
+
+            const totalIncome = incomeStats.reduce((sum, val) => sum + val, 0);
+            document.getElementById('total-income').innerText = `${totalIncome.toLocaleString('ru-RU')} ₽`;
 
             if (incomeChart) incomeChart.destroy();
             
